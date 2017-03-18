@@ -1,25 +1,35 @@
-/**
- * 
- */
+var sysFsPath = '/sys/class/gpio/gpio';
+var pinMapping = {
+    '16': 23
+};
 
-var gpio = require("pi-gpio");
+function open(pinNumber, direction, callback) {
+    const path = sysFsPath + pinMapping[pinNumber] + '/direction';
 
-function flashLED(pin, duration) {
-    return setInterval(function() {
-        gpio.open(pin, "output", function(err) {
-            gpio.write(pin, 1, function() {
-                setTimeout(function() {
-                    gpio.write(pin, 0, function(err) {
-                        gpio.close(pin);
-                    });
-                }, duration/2);
-            });
-        });
-    }, duration);
+    fs.writeFile(path, direction, (callback || noOp));
 }
 
-var intervalID = flashLED(18, 500);
+function write(pinNumber, value, callback) {
+    const path = sysFsPath + pinMapping[pinNumber] + '/value';
+    value = !! value ? '1' : '0';
 
-setTimeout(function() {
-    clearInterval(intervalID);
-}, 60000);
+    fs.writeFile(path, value, 'utf8', callback);
+}
+
+function noOp() {}
+
+gpio.open(18, 'out', function() {
+    var on = 0;
+
+    var blinker = setInterval(function() {
+        gpio.write(16, on, function() {
+            on = (on + 1) % 2;
+
+            console.log('ON = ' + on);
+        });
+    }, 1000);
+
+    setTimeout(function() {
+        clearInterval(blinker);
+    }, 12000);
+});
