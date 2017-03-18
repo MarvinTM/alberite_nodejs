@@ -1,35 +1,28 @@
-var sysFsPath = '/sys/class/gpio/gpio';
-var pinMapping = {
-    '16': 23
-};
+var onoff = require('onoff'); //#A
 
-function open(pinNumber, direction, callback) {
-    const path = sysFsPath + pinMapping[pinNumber] + '/direction';
+var Gpio = onoff.Gpio,
+  led = new Gpio(4, 'out'), //#B
+  interval;
 
-    fs.writeFile(path, direction, (callback || noOp));
-}
+interval = setInterval(function () { //#C
+  var value = (led.readSync() + 1) % 2; //#D
+  led.write(value, function() { //#E
+    console.log("Changed LED state to: " + value);
+  });
+}, 2000);
 
-function write(pinNumber, value, callback) {
-    const path = sysFsPath + pinMapping[pinNumber] + '/value';
-    value = !! value ? '1' : '0';
-
-    fs.writeFile(path, value, 'utf8', callback);
-}
-
-function noOp() {}
-
-gpio.open(18, 'out', function() {
-    var on = 0;
-
-    var blinker = setInterval(function() {
-        gpio.write(16, on, function() {
-            on = (on + 1) % 2;
-
-            console.log('ON = ' + on);
-        });
-    }, 1000);
-
-    setTimeout(function() {
-        clearInterval(blinker);
-    }, 12000);
+process.on('SIGINT', function () { //#F
+  clearInterval(interval);
+  led.writeSync(0); //#G
+  led.unexport();
+  console.log('Bye, bye!');
+  process.exit();
 });
+
+// #A Import the onoff library
+// #B Initialize pin 4 to be an output pin
+// #C This interval will be called every 2 seconds
+// #D Synchronously read the value of pin 4 and transform 1 to 0 or 0 to 1
+// #E Asynchronously write the new value to pin 4
+// #F Listen to the event triggered on CTRL+C
+// #G Cleanly close the GPIO pin before exiting
