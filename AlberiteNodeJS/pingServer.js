@@ -52,37 +52,52 @@ console.log("boom");
 
 });
 
+//INITIALIZING EXTERNAL IP FUNCTION
+
+var externalip = require('externalip');
+//
+
+
+
 //INITIALIZING FUNCTIONS TO DO REMOTE REQUESTS
 
 function doRequest(endPoint, requestData, callback) {
-  var http = require('http');
-  var querystring = require('querystring');
-
-  // write data to request body
-  var post_data = querystring.stringify(requestData);
-  var options = {
-    host: '54.171.57.179',
-    port: 8080,
-    method: 'POST',
-    path: '/'+endPoint,
-    headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(post_data)
+  externalip(function(err, ip) {
+    if(err) {
+      requestData.externalip='unknown';
+    } else {
+      requestData.externalip=ip;
     }
-  };
 
-  var req = http.request(options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function (stateReturnedByServer) {
-      callback(stateReturnedByServer);
+    var http = require('http');
+    var querystring = require('querystring');
+
+    // write data to request body
+    var post_data = querystring.stringify(requestData);
+    var options = {
+      host: '54.171.57.179',
+      port: 8080,
+      method: 'POST',
+      path: '/'+endPoint,
+      headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(post_data)
+      }
+    };
+
+    var req = http.request(options, function(res) {
+      res.setEncoding('utf8');
+      res.on('data', function (stateReturnedByServer) {
+        callback(stateReturnedByServer);
+      });
     });
-  });
-  req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
-  });
+    req.on('error', function(e) {
+      console.log('problem with request: ' + e.message);
+    });
 
-  req.write(post_data);
-  req.end();
+    req.write(post_data);
+    req.end();
+  });
 };
 //END INITIALIZING REMOTE REQUEST FUNCTIONS
 
@@ -140,7 +155,7 @@ function initiateMainPing() {
         initiateSystem(returnedState.systemInfo[0]);
       }
     });
-  }, 1000);
+  }, 10000);
 };
 
 initiateMainPing();
