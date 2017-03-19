@@ -4,19 +4,18 @@ function doRequest() {
 
   // write data to request body
   var requestData = {
-    message: 'Pinging from RaspberryPi',
-    messagedate: new Date(),
+    message: 'Status normal',
+    messagedate: new Date().toISOString(),
     type: 'INFO'
   };
   //req.write('hola!!!');
   //req.write(JSON.stringify(requestData));
   var post_data = querystring.stringify(requestData);
-
   var options = {
     host: '54.171.57.179',
     port: 8080,
     method: 'POST',
-    path: '/addlog',
+    path: '/ping',
     headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Content-Length': Buffer.byteLength(post_data)
