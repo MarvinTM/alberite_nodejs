@@ -108,7 +108,7 @@ function initiateSystem(systemInfo) {
   var requestData = {
        message: 'Initiating system...',
        messagedate: new Date().toISOString(),
-       type: 'INFO'
+       type: 'ACTION'
     };
 
   doRequest('systemInitiating', requestData, function(stateReturnedByServer) {
@@ -118,14 +118,14 @@ console.log(systemInfo);
       var startedData = {
         message: 'System initiated  in phase'+systemInfo.phase,
         messagedate: new Date().toISOString(),
-        type: 'INFO'
+        type: 'ACTION'
       };
       doRequest('systemHasStarted', startedData, function(){});
     }, function() {
       var startedData = {
         message: 'System finished in phase '+systemInfo.phase,
         messagedate: new Date().toISOString(),
-        type: 'INFO'
+        type: 'ACTION'
       };
       doRequest('systemHasFinished', startedData, function(){
         initiateMainPing();
