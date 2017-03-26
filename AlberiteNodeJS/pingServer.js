@@ -3,18 +3,20 @@
 var onoff = require('onoff'); //#A
 
 var Gpio = onoff.Gpio,
-  gpios = [new Gpio(18, 'out')]; //#B
+  gpios = [new Gpio(21, 'out'), new Gpio(17, 'out'),
+new Gpio(18, 'out'),new Gpio(27, 'out'),
+new Gpio(22, 'out'),new Gpio(23, 'out'),
+new Gpio(24, 'out'),new Gpio(25, 'out')]; //#B
 
 function startGPIO(phase, time, callbackStart, callbackEnd) {
   var theGpio = gpios[phase-1];
-  var value = 1;
 console.log(phase);
 console.log(time);
-  theGpio.write(value, function() {
+  theGpio.write(0, function() {
 console.log('starting gpio...')
     setTimeout(function() {
       console.log('ending gpio...');
-      theGpio.write(0, function() {
+      theGpio.write(1, function() {
         callbackEnd();
       });
     }, time*1000);
@@ -25,7 +27,7 @@ console.log('starting gpio...')
 
 function resetGPIOs() {
   gpios.forEach(function(theGpio) {
-    theGpio.write(0);
+    theGpio.write(1);
   });
 };
 
@@ -52,6 +54,8 @@ console.log("boom");
 
 });
 
+
+resetGPIOs();
 //INITIALIZING EXTERNAL IP FUNCTION
 
 var externalip = require('externalip');
@@ -106,7 +110,7 @@ function initiateSystem(systemInfo) {
   clearInterval(pingInterval);
   console.log('initiating system!!!');
   var requestData = {
-       message: 'Initiating system...',
+       message: 'Iniciando sistema...',
        messagedate: new Date().toISOString(),
        type: 'ACTION'
     };
@@ -116,14 +120,14 @@ function initiateSystem(systemInfo) {
 console.log(systemInfo);
     startGPIO(systemInfo.phase, systemInfo.time, function() {
       var startedData = {
-        message: 'System initiated  in phase'+systemInfo.phase,
+        message: 'Sistema iniciado en fase '+systemInfo.phase,
         messagedate: new Date().toISOString(),
         type: 'ACTION'
       };
       doRequest('systemHasStarted', startedData, function(){});
     }, function() {
       var startedData = {
-        message: 'System finished in phase '+systemInfo.phase,
+        message: 'Sistema finalizado en fase '+systemInfo.phase,
         messagedate: new Date().toISOString(),
         type: 'ACTION'
       };
@@ -155,7 +159,7 @@ function initiateMainPing() {
         initiateSystem(returnedState.systemInfo[0]);
       }
     });
-  }, 10000);
+  }, 30000);
 };
 
 initiateMainPing();
