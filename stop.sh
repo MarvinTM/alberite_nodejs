@@ -1,1 +1,1 @@
-kill -9 $(ps aux | grep 'node' | awk '{print $2}')
+sudo kill -9 $(ps aux | grep 'node' | awk '{print $2}')

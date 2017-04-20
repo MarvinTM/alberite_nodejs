@@ -10,10 +10,10 @@ new Gpio(24, 'out'),new Gpio(25, 'out')]; //#B
 
 function startGPIO(phase, time, callbackStart, callbackEnd) {
   var theGpio = gpios[phase-1];
-console.log(phase);
-console.log(time);
+  console.log(phase);
+  console.log(time);
   theGpio.write(0, function() {
-console.log('starting gpio...')
+    console.log('starting gpio...')
     setTimeout(function() {
       console.log('ending gpio...');
       theGpio.write(1, function() {
@@ -143,7 +143,7 @@ console.log(systemInfo);
 var pingInterval;
 
 function initiateMainPing() {
-  pingInterval = setInterval(function(){
+  var pingFunction = function(){
     var requestData = {
        message: 'Status normal',
        messagedate: new Date().toISOString(),
@@ -159,7 +159,9 @@ function initiateMainPing() {
         initiateSystem(returnedState.systemInfo[0]);
       }
     });
-  }, 30000);
+  };
+  pingFunction();
+  pingInterval = setInterval(pingFunction, 30000);
 };
 
 initiateMainPing();
