@@ -66,12 +66,24 @@ var externalip = require('externalip');
 //INITIALIZING FUNCTIONS TO DO REMOTE REQUESTS
 
 function doRequest(endPoint, requestData, callback) {
-  externalip(function(err, ip) {
-    if(err) {
-      requestData.externalip='unknown';
-    } else {
-      requestData.externalip=ip;
-    }
+  try {
+    externalip(function(err, ip) {
+      if(err) {
+        console.error('Error while reading external ip: ', err);
+        executeRequest('undefined', endPoint, requestData, callback);
+      } else {
+        executeRequest(ip, endPoint, requestData, callback);
+      }
+    });
+  } catch(error) {
+    console.error('Error while reading external ip: ', error);
+    executeRequest('undefined', endPoint, requestData, callback);
+  }
+
+};
+
+function executeRequest(externalip, endPoint, requestData, callback) {
+    requestData.externalip=externalip;
 
     var http = require('http');
     var querystring = require('querystring');
@@ -101,7 +113,6 @@ function doRequest(endPoint, requestData, callback) {
 
     req.write(post_data);
     req.end();
-  });
 };
 //END INITIALIZING REMOTE REQUEST FUNCTIONS
 
