@@ -66,7 +66,12 @@ var externalip = require('externalip');
 //INITIALIZING FUNCTIONS TO DO REMOTE REQUESTS
 
 function doRequest(endPoint, requestData, callback) {
-  try {
+  var d = require('domain').create();
+  d.on('error', function(err){
+    console.error('Error while reading external ip: ', error);
+    executeRequest('undefined', endPoint, requestData, callback);
+  });
+  d.run(function(){
     externalip(function(err, ip) {
       if(err) {
         console.error('Error while reading external ip: ', err);
@@ -75,11 +80,7 @@ function doRequest(endPoint, requestData, callback) {
         executeRequest(ip, endPoint, requestData, callback);
       }
     });
-  } catch(error) {
-    console.error('Error while reading external ip: ', error);
-    executeRequest('undefined', endPoint, requestData, callback);
-  }
-
+  });
 };
 
 function executeRequest(externalip, endPoint, requestData, callback) {
