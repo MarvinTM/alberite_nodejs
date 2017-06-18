@@ -1,1 +1,1 @@
-nohup nodejs AlberiteNodeJS/pingServer.js &
+nohup node AlberiteNodeJS/pingServer.js &
