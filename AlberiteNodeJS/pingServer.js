@@ -25,6 +25,27 @@ function startGPIO(phase, time, callbackStart, callbackEnd) {
 
 }
 
+function readGpio(gpioState, index, callback) {
+  if(index===gpios.length) {
+    callback(gpioState);
+    return;
+  }
+  var gpio = gpios[index];
+  gpio.read(function(err, value) {
+    if (err) {
+      throw err;
+    }
+    var gpioStateObj = {pin: index+1, status: value === 0?'on':'off'};
+    gpioState.push(gpioStateObj);
+    readGpio(gpioState, index+1, callback);
+  });
+}
+
+function readGpios(callback) {
+  var gpioState = [];
+  readGpio(gpioState, 0, callback);
+}
+
 function resetGPIOs() {
   gpios.forEach(function(theGpio) {
     theGpio.write(1);
@@ -65,12 +86,16 @@ var publicIp = require('public-ip');
 //INITIALIZING FUNCTIONS TO DO REMOTE REQUESTS
 
 function doRequest(endPoint, requestData, callback) {
-  publicIp.v4().then(function(ip){
-    executeRequest(ip, endPoint, requestData, callback);
-  }).catch(function(error){
-    console.error('Error while reading external ip: ', error);
-    executeRequest('undefined', endPoint, requestData, callback);
-  });;
+  readGpios(function(gpioState) {
+    console.log('state: '+JSON.stringify(gpioState));
+    requestData.gpioState = JSON.stringify(gpioState); 
+    publicIp.v4().then(function(ip){
+      executeRequest(ip, endPoint, requestData, callback);
+    }).catch(function(error){
+      console.error('Error while reading external ip: ', error);
+      executeRequest('undefined', endPoint, requestData, callback);
+    });
+  });
 };
 
 function executeRequest(externalip, endPoint, requestData, callback) {
