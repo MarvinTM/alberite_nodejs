@@ -16,6 +16,8 @@ var Gpio = onoff.Gpio,
     new Gpio(25, "out")
   ]; //#B
 
+let systemActive = false;
+
 function startGPIO(phase, time, callbackStart, callbackEnd) {
   var theGpio = gpios[phase - 1];
   console.log(phase);
@@ -139,6 +141,7 @@ function executeRequest(externalip, endPoint, requestData, callback) {
 
 function initiateSystem(systemInfo) {
   clearInterval(pingInterval);
+  systemActive = true;
   console.log("initiating system!!!");
   var requestData = {
     message: "Iniciando sistema...",
@@ -161,6 +164,7 @@ function initiateSystem(systemInfo) {
         doRequest("systemHasStarted", startedData, function() {});
       },
       function() {
+        systemActive = false;
         var startedData = {
           message: "Sistema finalizado en fase " + systemInfo.phase,
           messagedate: new Date().toISOString(),
@@ -179,6 +183,9 @@ var pingInterval;
 
 function initiateMainPing() {
   var pingFunction = function() {
+    if (systemActive) {
+      return;
+    }
     var requestData = {
       message: "Status normal",
       messagedate: new Date().toISOString(),
