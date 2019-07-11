@@ -2,6 +2,8 @@
 
 var onoff = require("onoff"); //#A
 
+let mainPingTime = 1000;
+
 var Gpio = onoff.Gpio,
   gpios = [
     new Gpio(21, "out"),
@@ -194,7 +196,7 @@ function initiateMainPing() {
     });
   };
   pingFunction();
-  pingInterval = setInterval(pingFunction, 30000);
+  pingInterval = setInterval(pingFunction, mainPingTime);
 }
 
 initiateMainPing();
