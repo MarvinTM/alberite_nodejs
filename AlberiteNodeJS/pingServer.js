@@ -140,7 +140,6 @@ function executeRequest(externalip, endPoint, requestData, callback) {
 //END INITIALIZING REMOTE REQUEST FUNCTIONS
 
 function initiateSystem(systemInfo) {
-  clearInterval(pingInterval);
   systemActive = true;
   console.log("initiating system!!!");
   var requestData = {
@@ -178,9 +177,6 @@ function initiateSystem(systemInfo) {
   });
 }
 
-//Main application ping to the server
-var pingInterval;
-
 function initiateMainPing() {
   var pingFunction = function() {
     if (systemActive) {
@@ -196,14 +192,14 @@ function initiateMainPing() {
       console.log("State returned by server: " + stateReturnedByServer);
       var returnedState = JSON.parse(stateReturnedByServer);
       if (returnedState.opCode === 0) {
-        //Everything is ok, no special action
+        //Everything is ok, we launch ping again
+        setTimeout(pingFunction, mainPingTime);
       } else if (returnedState.opCode === 1) {
         initiateSystem(returnedState.systemInfo[0]);
       }
     });
   };
-  pingFunction();
-  pingInterval = setInterval(pingFunction, mainPingTime);
+  setTimeout(pingFunction, mainPingTime);
 }
 
 initiateMainPing();
