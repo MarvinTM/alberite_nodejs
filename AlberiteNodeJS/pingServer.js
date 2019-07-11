@@ -2,7 +2,7 @@
 
 var onoff = require("onoff"); //#A
 
-let mainPingTime = 1000;
+let mainPingTime = 5000;
 
 var Gpio = onoff.Gpio,
   gpios = [
