@@ -1,11 +1,11 @@
 #!/bin/bash
-nodesRunning=$( ps axu | grep 'node' | wc -l )
+nodesRunning=$( ps axu | grep '/usr/local/bin/node' | wc -l )
 echo $nodesRunning
-if [ $nodesRunning != 2 ] 
+if [ $nodesRunning = 2 ] 
 then
-  echo "Alberite not running, restarting it..." 
-  sh /home/pi/alberite/alberite_nodejs/start.sh
+  echo "Alberite program running, everything is fine."
 else
-  echo "Alberite program running, everything is fine." 
+  echo "Alberite not running, restarting it..."
+  sh /home/pi/alberite/alberite_nodejs/start.sh
 fi
 
