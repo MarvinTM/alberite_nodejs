@@ -126,8 +126,12 @@ function executeRequest(externalip, endPoint, requestData, callback) {
 
   var req = http.request(options, function(res) {
     res.setEncoding("utf8");
+    let data = '';
     res.on("data", function(stateReturnedByServer) {
-      callback(stateReturnedByServer);
+      data += stateReturnedByServer;
+    });
+    res.on("end", function(stateReturnedByServer) {
+      callback(data);
     });
   });
   req.on("error", function(e) {
